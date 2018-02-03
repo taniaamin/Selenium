@@ -29,9 +29,4 @@ public class classwork extends BasePage {
 
     }
 
-
-    Calendar cal = Calendar.getInstance();
-    SimpleDateFormat sdf = new SimpleDateFormat("HH");
-    String time= sdf.format(cal.getTime());
-    for(i=time)
 }

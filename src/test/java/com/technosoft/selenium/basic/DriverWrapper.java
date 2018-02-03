@@ -27,7 +27,7 @@ public class DriverWrapper {
         //Initialize web driver interface
         driver = new ChromeDriver();
         //Goto designated url to run test case
-        driver.navigate().to("https://darksky.net/forecast/40.7127,-74.0059/us12/en");
+        driver.navigate().to(url);
         driver.manage().window().maximize();
     }
 

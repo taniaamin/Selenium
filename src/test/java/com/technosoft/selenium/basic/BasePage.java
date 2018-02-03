@@ -1,66 +1,84 @@
 package com.technosoft.selenium.basic;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 import org.testng.annotations.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 
 public class BasePage extends DriverWrapper {
 
-// base method for click
-    public void clickOn(By locator) {
-        DriverWrapper.getDriver().findElement(locator).click();
+// Fluent wait function to be used throughout this class:
+    private static WebElement webAction(final By locator) {
+        Wait<WebDriver> wait = new FluentWait<WebDriver>(getDriver())
+                .withTimeout(15, TimeUnit.SECONDS)
+                .pollingEvery(1, TimeUnit.SECONDS)
+                .ignoring(NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementNotFoundException.class)
+                .withMessage("Webdriver waited for 15 seconds but still could not find the element therefore Timeout Exception has been thrown");
+
+        WebElement element = wait.until(new Function<WebDriver, WebElement>() {
+            public WebElement apply(WebDriver driver) {
+                return driver.findElement(locator); }});
+
+        return element;
     }
 
-// base method for input in a selected field
-    public void setValueToInputField(String value, By locator) {
-        DriverWrapper.getDriver().findElement(locator).sendKeys(value);
+// base method for click
+    public void clickOn(By locator) {
+        webAction(locator).click();
     }
+
+
 
 //    Method to send input
     public void sendInput(By locator, String string) {
-        DriverWrapper.getDriver().findElement(locator).sendKeys(string);
+        webAction(locator).sendKeys(string);
     }
 
 // base method to get text from an element
     public String getTextFromElement(By locator) {
-        return DriverWrapper.getDriver().findElement(locator).getText();
+        return webAction(locator).getText();
     }
 
 // base method for isElements
     public boolean isDisplayed(By locator) {
-        return DriverWrapper.getDriver().findElement(locator).isDisplayed();
+        return webAction(locator).isDisplayed();
     }
 
     public boolean isEnablead(By locator) {
 
-        return DriverWrapper.getDriver().findElement(locator).isEnabled();
+        return webAction(locator).isEnabled();
     }
 
     public boolean isSelected(By locator) {
-        return DriverWrapper.getDriver().findElement(locator).isSelected();
+        return webAction(locator).isSelected();
     }
 
 // base method for dropdown, we should have options to select by text, index and value
     public void selectDropDownByText(By locator, String text) {
-        Select dropDown = new Select(DriverWrapper.getDriver().findElement(locator));
+        Select dropDown = new Select(webAction(locator));
         dropDown.selectByVisibleText(text);
     }
 
     public void selectDropDownByIndex(By locator, int index) {
-        Select dropDown = new Select(DriverWrapper.getDriver().findElement(locator));
+        Select dropDown = new Select(webAction(locator));
         dropDown.selectByIndex(index);
     }
 
     public void selectDropDownByValue(By locator, String value) {
-        Select dropDown = new Select(DriverWrapper.getDriver().findElement(locator));
+        Select dropDown = new Select(webAction(locator));
         dropDown.selectByValue(value);
     }
 
@@ -112,7 +130,7 @@ public class BasePage extends DriverWrapper {
 
 // base method to handle mouseover
     public void handleMouseOver(By locator) {
-        WebElement element = DriverWrapper.getDriver().findElement(locator);
+        WebElement element = webAction(locator);
         Actions action = new Actions(DriverWrapper.getDriver());
         action.moveToElement(element).build().perform();
     }
